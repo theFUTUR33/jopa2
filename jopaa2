@@ -1,0 +1,177 @@
+<dependencies>
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.8</version> <!-- проверьте актуальную версию -->
+    </dependency>
+</dependencies>
+22
+
+package game;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Game {
+    private static final String RULES_FILE = "rules.txt";
+    private static final String[] NAMES_POOL = {"Alice", "Bob", "Charlie", "Diana"};
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean isRunning = true;
+
+        while (isRunning) {
+            System.out.println("1. Начать игру");
+            System.out.println("2. Правила игры");
+            System.out.println("3. Выйти");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    startGame(scanner);
+                    break;
+                case 2:
+                    displayRules();
+                    break;
+                case 3:
+                    isRunning = false;
+                    break;
+                default:
+                    System.out.println("Неверный выбор. Попробуйте снова.");
+            }
+        }
+    }
+
+    private static void displayRules() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(RULES_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка при прочтении правил: " + e.getMessage());
+        }
+    }
+
+    private static void startGame(Scanner scanner) {
+        System.out.println("Введите имя игрока или введите 'random' для генерации:");
+        String playerName = scanner.next();
+
+        if (playerName.equalsIgnoreCase("random")) {
+            Random random = new Random();
+            playerName = NAMES_POOL[random.nextInt(NAMES_POOL.length)] + random.nextInt(100000);
+        }
+
+        Player player = new Player(playerName);
+        // Здесь можно инициировать компьютерных игроков и начать игру, передав игрока и логик игры
+        GameLogic gameLogic = new GameLogic();
+        gameLogic.startGame(player);
+    }
+}
+22
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
+public class MyTest {
+
+    @Test
+    public void testAddition() {
+        int a = 2;
+        int b = 3;
+        int sum = a + b;
+        assertEquals(5, sum);
+    }
+}
+22
+package game;
+
+import java.util.Random;
+
+public class ComputerPlayer extends Player {
+    private static final Random random = new Random();
+
+    public ComputerPlayer(String name) {
+        super(name);
+    }
+
+    public boolean decideToRaise() {
+        return random.nextDouble() < 0.6;
+    }
+}
+22
+package timer;
+
+public class CountdownTimer {
+    private int seconds;
+
+    public CountdownTimer(int seconds) {
+        this.seconds = seconds;
+    }
+
+    public void start() {
+        new Thread(() -> {
+            for (int i = seconds; i > 0; i--) {
+                System.out.println("Осталось времени: " + i + " секунд");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            System.out.println("Время вышло!");
+        }).start();
+    }
+}
+22
+
+package game;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import com.google.gson.Gson;
+
+public class Logger {
+    private static final String LOG_FILE = "game_log.json";
+    private game.Gson gson = new Gson();
+
+    public void log(Object data) {
+        try (FileWriter writer = new FileWriter(LOG_FILE, true)) {
+            String json = gson.toJson(data);
+            writer.write(json + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+22
+
+package game_log;
+
+public class json {
+}
+
+
+22
+
+package game;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+public class GameTest {
+
+    @Test
+    public void testPlayerName() {
+        Player player = new Player("John");
+        assertEquals("John", player.getName());
+    }
+}
+22
+
+
+
